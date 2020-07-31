@@ -1,5 +1,6 @@
 """Support for Tado sensors for each zone."""
 import logging
+from math import radians, sin, cos
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import TEMP_CELSIUS, UNIT_PERCENTAGE
@@ -239,17 +240,25 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
             }
 
         elif self.zone_variable == "air comfort humidity":
+            radial = self._tado.airconfort["comfort"][0]['coordinate']['radial']
+            angular = self._tado.airconfort["comfort"][0]['coordinate']['angular']
             self._state = self._tado.airconfort["comfort"][0]['humidityLevel']
             self._state_attributes = {
-                "radial":  self._tado.airconfort["comfort"][0]['coordinate']['radial'],
-                "angular": self._tado.airconfort["comfort"][0]['coordinate']['angular'],
+                "radial":  radial,
+                "angular": angular,
+                "humidity": radial * cos(radians(angular)),
+                "temperature": radial * sin(radians(angular))
             }
 
         elif self.zone_variable == "air comfort temperature":
+            radial = self._tado.airconfort["comfort"][0]['coordinate']['radial']
+            angular = self._tado.airconfort["comfort"][0]['coordinate']['angular']
             self._state = self._tado.airconfort["comfort"][0]['temperatureLevel']
             self._state_attributes = {
-                "radial":  self._tado.airconfort["comfort"][0]['coordinate']['radial'],
-                "angular": self._tado.airconfort["comfort"][0]['coordinate']['angular'],
+                "radial":  radial,
+                "angular": angular,
+                "humidity": radial * cos(radians(angular)),
+                "temperature": radial * sin(radians(angular))
             }
 
 
