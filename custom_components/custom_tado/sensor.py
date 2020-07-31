@@ -157,9 +157,9 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
     @property
     def icon(self):
         """Icon for the sensor."""
-        if self.zone_variable == "temperature":
+        if self.zone_variable in ["temperature", "air freshness", "air comfort temperature"]:
             return "mdi:thermometer"
-        if self.zone_variable == "humidity":
+        if self.zone_variable in ["humidity", "air comfort humidity"]:
             return "mdi:water-percent"
 
     @callback
@@ -240,9 +240,17 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
 
         elif self.zone_variable == "air comfort humidity":
             self._state = self._tado.airconfort["comfort"][0]['humidityLevel']
+            self._state_attributes = {
+                "radial":  self._tado.airconfort["comfort"][0]['coordinate']['radial'],
+                "angular": self._tado.airconfort["comfort"][0]['coordinate']['angular'],
+            }
 
         elif self.zone_variable == "air comfort temperature":
             self._state = self._tado.airconfort["comfort"][0]['temperatureLevel']
+            self._state_attributes = {
+                "radial":  self._tado.airconfort["comfort"][0]['coordinate']['radial'],
+                "angular": self._tado.airconfort["comfort"][0]['coordinate']['angular'],
+            }
 
 
 class TadoDeviceSensor(Entity):
