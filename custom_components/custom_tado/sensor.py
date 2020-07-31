@@ -42,6 +42,9 @@ ZONE_SENSORS = {
         "tado mode",
         "overlay",
         "open window",
+        "air freshness",
+        "air comfort humidity",
+        "air comfort temperature",
     ],
     TYPE_HOT_WATER: ["power", "link", "tado mode", "overlay"],
 }
@@ -227,6 +230,19 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
                 or self._tado_zone_data.open_window_detected
             )
             self._state_attributes = self._tado_zone_data.open_window_attr
+
+        elif self.zone_variable == "air freshness":
+            self._state = self._tado.airconfort["freshness"]["value"]
+            self._state_attributes = {
+                "lastOpenWindow": self._tado.airconfort["freshness"]['lastOpenWindow'],
+                "acPoweredOn": self._tado.airconfort["freshness"]['acPoweredOn']
+            }
+
+        elif self.zone_variable == "air comfort humidity":
+            self._state = self._tado.airconfort["comfort"][0]['humidityLevel']
+
+        elif self.zone_variable == "air comfort temperature":
+            self._state = self._tado.airconfort["comfort"][0]['temperatureLevel']
 
 
 class TadoDeviceSensor(Entity):

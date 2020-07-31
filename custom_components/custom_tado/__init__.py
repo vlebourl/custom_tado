@@ -3,7 +3,7 @@ import asyncio
 from datetime import timedelta
 import logging
 
-from PyTado.interface import Tado
+from .PyTado.interface import Tado
 from requests import RequestException
 import requests.exceptions
 import voluptuous as vol
@@ -170,6 +170,7 @@ class TadoConnector:
             "zone": {},
             "device": {},
         }
+        self.airconfort = None
 
     @property
     def fallback(self):
@@ -216,6 +217,7 @@ class TadoConnector:
             return
 
         self.data[sensor_type][sensor] = data
+        self.airconfort = self.tado.getAirComfort()
 
         _LOGGER.debug(
             "Dispatching update to %s %s %s: %s",
