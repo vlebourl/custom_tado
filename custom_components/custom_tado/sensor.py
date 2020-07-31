@@ -177,6 +177,8 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
         except KeyError:
             return
 
+        radial = self._tado.airconfort["comfort"][0]['coordinate']['radial']
+        angular = self._tado.airconfort["comfort"][0]['coordinate']['angular']
         if self.zone_variable == "temperature":
             self._state = self.hass.config.units.temperature(
                 self._tado_zone_data.current_temp, TEMP_CELSIUS
@@ -240,25 +242,17 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
             }
 
         elif self.zone_variable == "air comfort humidity":
-            radial = self._tado.airconfort["comfort"][0]['coordinate']['radial']
-            angular = self._tado.airconfort["comfort"][0]['coordinate']['angular']
             self._state = self._tado.airconfort["comfort"][0]['humidityLevel']
             self._state_attributes = {
-                "radial":  radial,
-                "angular": angular,
-                "humidity": radial * cos(radians(angular)),
-                "temperature": radial * sin(radians(angular))
+                "humidity": round(radial * cos(radians(angular)), 2),
+                "temperature": round(radial * sin(radians(angular)), 2)
             }
 
         elif self.zone_variable == "air comfort temperature":
-            radial = self._tado.airconfort["comfort"][0]['coordinate']['radial']
-            angular = self._tado.airconfort["comfort"][0]['coordinate']['angular']
             self._state = self._tado.airconfort["comfort"][0]['temperatureLevel']
             self._state_attributes = {
-                "radial":  radial,
-                "angular": angular,
-                "humidity": radial * cos(radians(angular)),
-                "temperature": radial * sin(radians(angular))
+                "humidity": round(radial * cos(radians(angular)), 2),
+                "temperature": round(radial * sin(radians(angular)), 2)
             }
 
 
