@@ -3,10 +3,15 @@ import logging
 from math import radians, sin, cos
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import TEMP_CELSIUS, UNIT_PERCENTAGE
+from homeassistant.const import TEMP_CELSIUS
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import Entity
+
+try:  # TODO: Remove for core PR. This ensures compatibility with <0.115
+    from homeassistant.const import PERCENTAGE
+except Exception:
+    from homeassistant.const import UNIT_PERCENTAGE as PERCENTAGE
 
 from .const import (
     DATA,
@@ -149,9 +154,9 @@ class TadoZoneSensor(TadoZoneEntity, Entity):
         if self.zone_variable == "temperature":
             return self.hass.config.units.temperature_unit
         if self.zone_variable == "humidity":
-            return UNIT_PERCENTAGE
+            return PERCENTAGE
         if self.zone_variable == "heating":
-            return UNIT_PERCENTAGE
+            return PERCENTAGE
         if self.zone_variable == "ac":
             return None
 
