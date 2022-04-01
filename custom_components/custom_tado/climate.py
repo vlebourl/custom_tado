@@ -87,10 +87,9 @@ def _generate_entities(tado):
     entities = []
     for zone in tado.zones:
         if zone["type"] in [TYPE_HEATING, TYPE_AIR_CONDITIONING]:
-            entity = create_climate_entity(
+            if entity := create_climate_entity(
                 tado, zone["name"], zone["id"], zone["devices"][0]
-            )
-            if entity:
+            ):
                 entities.append(entity)
     return entities
 
@@ -164,7 +163,7 @@ def create_climate_entity(tado, name: str, zone_id: int, zone: dict):
         cool_max_temp = float(cool_temperatures["celsius"]["max"])
         cool_step = cool_temperatures["celsius"].get("step", PRECISION_TENTHS)
 
-    entity = TadoClimate(
+    return TadoClimate(
         tado,
         name,
         zone_id,
@@ -180,7 +179,6 @@ def create_climate_entity(tado, name: str, zone_id: int, zone: dict):
         support_flags,
         zone,
     )
-    return entity
 
 
 class TadoClimate(TadoZoneEntity, ClimateEntity):
@@ -323,9 +321,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity):
     @property
     def preset_mode(self):
         """Return the current preset mode (home, away)."""
-        if self._tado_zone_data.is_away:
-            return PRESET_AWAY
-        return PRESET_HOME
+        return PRESET_AWAY if self._tado_zone_data.is_away else PRESET_HOME
 
     @property
     def preset_modes(self):

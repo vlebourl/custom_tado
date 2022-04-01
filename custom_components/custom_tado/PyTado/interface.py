@@ -44,7 +44,7 @@ class Tado:
             _LOGGER.debug("mobile api: %s",
                           cmd)
 
-        url = '%s%s' % (self.mobi2url, cmd)
+        url = f'{self.mobi2url}{cmd}'
         response = self._http_session.request("get", url, headers=self.headers, timeout=self.timeout)
 
         if self._debugCalls:
@@ -103,7 +103,7 @@ class Tado:
         # then we have a 30 seconds timespan to get a new refresh_token
         self.refresh_at = self.refresh_at + datetime.timedelta(seconds=-30)
 
-        self.headers['Authorization'] = 'Bearer ' + access_token
+        self.headers['Authorization'] = f'Bearer {access_token}'
 
     def _refresh_token(self):
         if self.refresh_at >= datetime.datetime.now():
@@ -160,16 +160,14 @@ class Tado:
         # pylint: disable=C0103
 
         cmd = 'devices'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getZones(self):
         """Gets zones information."""
         # pylint: disable=C0103
 
         cmd = 'zones'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getZoneState(self, zone):
         """Gets current state of Zone as a TadoZone object."""
@@ -180,8 +178,7 @@ class Tado:
         # pylint: disable=C0103
 
         cmd = 'zones/%i/state' % zone
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getHomeState(self):
         """Gets current state of Home."""
@@ -191,16 +188,14 @@ class Tado:
         # is an indicator, that the homeState can be switched
         # {"presence":"HOME","showHomePresenceSwitchButton":true}
         cmd = 'state'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
     
     def getCapabilities(self, zone):
         """Gets current capabilities of Zone zone."""
         # pylint: disable=C0103
 
         cmd = 'zones/%i/capabilities' % zone
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getClimate(self, zone):
         """Gets temp (centigrade) and humidity (% RH) for Zone zone."""
@@ -231,8 +226,7 @@ class Tado:
             raise ValueError("Incorrect date format, should be YYYY-MM-DD")
 
         cmd = 'zones/%i/dayReport?date=%s' % (zone, day.strftime('%Y-%m-%d'))
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def setTimetable(self, zone, id):
         """Set the Timetable type currently active
@@ -247,8 +241,7 @@ class Tado:
 
         cmd = 'zones/%i/schedule/activeTimetable' % (zone)
 
-        data = self._apiCall(cmd, "PUT", {'id': id }, True)
-        return data
+        return self._apiCall(cmd, "PUT", {'id': id }, True)
 
     def getSchedule(self, zone, id, day=None):
         """Get the JSON representation of the schedule for a zone
@@ -265,8 +258,7 @@ class Tado:
         else:
             cmd = 'zones/%i/schedule/timetables/%i/blocks' % (zone,id)
 
-        data = self._apiCall(cmd, "GET", {}, True)
-        return data
+        return self._apiCall(cmd, "GET", {}, True)
 
 
     def setSchedule(self, zone, id, day, data):
@@ -287,47 +279,41 @@ class Tado:
         # pylint: disable=C0103
 
         cmd = 'weather'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getAirComfort(self):
         """Gets air quality information"""
         # pylint: disable=C0103
 
         cmd = 'airComfort'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
 
     def getAppUsers(self):
         """Gets getAppUsers data"""
         # pylint: disable=C0103
 
         cmd = 'getAppUsers'
-        data = self._mobile_apiCall(cmd)
-        return data
+        return self._mobile_apiCall(cmd)
 
     def getAppUsersRelativePositions(self):
         """Gets getAppUsersRelativePositions data"""
         # pylint: disable=C0103
 
         cmd = 'getAppUsersRelativePositions'
-        data = self._mobile_apiCall(cmd)
-        return data
+        return self._mobile_apiCall(cmd)
     
     def getMobileDevices(self):
         """Gets information about mobile devices"""
 
         cmd = 'mobileDevices'
-        data = self._apiCall(cmd)
-        return data
+        return self._apiCall(cmd)
     
     def resetZoneOverlay(self, zone):
         """Delete current overlay"""
         # pylint: disable=C0103
 
         cmd = 'zones/%i/overlay' % zone
-        data = self._apiCall(cmd, "DELETE", {}, True)
-        return data
+        return self._apiCall(cmd, "DELETE", {}, True)
 
     def setZoneOverlay(self, zone, overlayMode, setTemp=None, duration=None, deviceType='HEATING', power="ON", mode=None, fanSpeed=None, swing=None):
         """set current overlay for a zone"""
@@ -353,22 +339,19 @@ class Tado:
         if duration is not None:
             post_data["termination"]["durationInSeconds"] = duration
 
-        data = self._apiCall(cmd, "PUT", post_data)
-        return data
+        return self._apiCall(cmd, "PUT", post_data)
 
     def setHome(self):
         """Sets HomeState to HOME """
         cmd = 'presenceLock'
         payload = { "homePresence": "HOME" }
-        data = self._apiCall(cmd, "PUT", payload)
-        return data
+        return self._apiCall(cmd, "PUT", payload)
 
     def setAway(self):
         """Sets HomeState to AWAY """
         cmd = 'presenceLock'
         payload = { "homePresence": "AWAY" }
-        data = self._apiCall(cmd, "PUT", payload)
-        return data
+        return self._apiCall(cmd, "PUT", payload)
     
     def getWindowState(self, zone):
         """Returns the state of the window for Zone zone"""
@@ -387,14 +370,12 @@ class Tado:
         """Sets the window in Zone zone to open"""
         # this can only be set if an open window was detected in this zone
         cmd = 'zones/%i/state/openWindow/activate' % (zone)
-        data = self._apiCall(cmd, "POST", {}, True)
-        return data
+        return self._apiCall(cmd, "POST", {}, True)
 
     def resetOpenWindow(self, zone):
         """Sets the window in zone Zone to closed"""
         cmd = 'zones/%i/state/openWindow' % zone
-        data = self._apiCall(cmd, "DELETE", {}, True)
-        return data
+        return self._apiCall(cmd, "DELETE", {}, True)
     
     # Ctor
     def __init__(self, username, password, timeout=10, http_session=None):
@@ -405,7 +386,7 @@ class Tado:
         self.refresh_at = datetime.datetime.now() + datetime.timedelta(minutes=5)
 
         # pylint: disable=C0103
-        self._http_session = http_session if http_session else Session()
+        self._http_session = http_session or Session()
         self.headers = {'Referer' : 'https://my.tado.com/'}
         self._loginV2(username, password)
         self.id = self.getMe()['homes'][0]['id']

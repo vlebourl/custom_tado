@@ -104,7 +104,7 @@ def create_water_heater_entity(tado, name: str, zone_id: int, zone: str):
         min_temp = None
         max_temp = None
 
-    entity = TadoWaterHeater(
+    return TadoWaterHeater(
         tado,
         name,
         zone_id,
@@ -113,8 +113,6 @@ def create_water_heater_entity(tado, name: str, zone_id: int, zone: str):
         max_temp,
         zone["devices"][0],
     )
-
-    return entity
 
 
 class TadoWaterHeater(TadoZoneEntity, WaterHeaterEntity):

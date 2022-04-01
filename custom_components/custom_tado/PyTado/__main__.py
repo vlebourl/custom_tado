@@ -11,8 +11,7 @@ import sys
 import time
 
 def log_in(email, password):
-    t = tado_client(email,password)
-    return t
+    return tado_client(email,password)
 
 def get_me(args):
     t = log_in(args.email, args.password)
@@ -45,7 +44,10 @@ def main():
                                 help='Tado password.')
 
     # Flags with default values go here.
-    loglevels = dict((logging.getLevelName(level), level) for level in [10, 20, 30, 40, 50])
+    loglevels = {
+        logging.getLevelName(level): level for level in [10, 20, 30, 40, 50]
+    }
+
     parser.add_argument('--loglevel',
                         default='INFO',
                         choices=list(loglevels.keys()),

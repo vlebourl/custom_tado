@@ -56,14 +56,11 @@ class TadoDeviceScanner(DeviceScanner):
         # The Tado device tracker can work with or without a home_id
         self.home_id = config[CONF_HOME_ID] if CONF_HOME_ID in config else None
 
-        # If there's a home_id, we need a different API URL
-        if self.home_id is None:
-            self.tadoapiurl = "https://my.tado.com/api/v2/me"
-        else:
-            self.tadoapiurl = "https://my.tado.com/api/v2/homes/{home_id}/mobileDevices"
-
-        # The API URL always needs a username and password
-        self.tadoapiurl += "?username={username}&password={password}"
+        self.tadoapiurl = (
+            "https://my.tado.com/api/v2/me"
+            if self.home_id is None
+            else "https://my.tado.com/api/v2/homes/{home_id}/mobileDevices"
+        ) + "?username={username}&password={password}"
 
         self.websession = None
 
@@ -80,11 +77,9 @@ class TadoDeviceScanner(DeviceScanner):
 
     async def async_get_device_name(self, device):
         """Return the name of the given device or None if we don't know."""
-        filter_named = [
+        if filter_named := [
             result.name for result in self.last_results if result.mac == device
-        ]
-
-        if filter_named:
+        ]:
             return filter_named[0]
         return None
 
@@ -131,11 +126,13 @@ class TadoDeviceScanner(DeviceScanner):
 
         # Find devices that have geofencing enabled, and are currently at home.
         for mobile_device in tado_json:
-            if mobile_device.get("location"):
-                if mobile_device["location"]["atHome"]:
-                    device_id = mobile_device["id"]
-                    device_name = mobile_device["name"]
-                    last_results.append(Device(device_id, device_name))
+            if (
+                mobile_device.get("location")
+                and mobile_device["location"]["atHome"]
+            ):
+                device_id = mobile_device["id"]
+                device_name = mobile_device["name"]
+                last_results.append(Device(device_id, device_name))
 
         self.last_results = last_results
 
